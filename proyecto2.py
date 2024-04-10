@@ -7,11 +7,20 @@ Autores: Emanuel Antonio Marín Gutiérrez
 
 Descripcion: Pendiente
 
-Nota: Para la realización de este proyecto se utilizaron las bibliotecas pandas v2.2.1 y matplotlib v3.8.3
-      Si se ocupan instalar puede escribir: pip install pandas, matplotlib
+Nota: Para la realización de este proyecto se utilizaron la biblioteca matplotlib v3.8.3
+      Si se ocupan instalar puede escribir: pip install matplotlib
 """
-
+import math
 import matplotlib.pyplot as plt
+
+"""
+Nota: Remover despues esto si no es necesario
+import numpy as np
+from scipy.stats import nbinom
+
+prob = nbinom.pmf(10, 3, funcion_masa_probabilidad1[5])
+print(prob)
+"""
 
 # Definición de los dados ideales y trucados
 dado_ideal1 = [1/6]*6
@@ -31,8 +40,8 @@ def suma_dados(dado1, dado2):
     return suma_probabilidades
 
 # Función para graficar la función masa de probabilidad
-def plot_funcion_masa_probabilidad(masa_probabilidad):
-    valores = list(range(2, len(masa_probabilidad) + 2))
+def plot_funcion_masa_probabilidad(masa_probabilidad, n):
+    valores = list(range(n, len(masa_probabilidad) + n))
     
     bars = plt.bar(valores, masa_probabilidad, width=0.1)
     for bar in bars:
@@ -46,12 +55,41 @@ def plot_funcion_masa_probabilidad(masa_probabilidad):
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
 
+# Función que calcula la combinacion nCr
+def combinacion(n, r):
+    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
+
+# Función que calcula la probabilidad para la distribución binomial negativa
+# x es el número de ensayos totales hasta que se alcanzan r éxitos.
+# r es el número de éxitos requeridos.
+# p es la probabilidad de éxito en un solo ensayo.
+def distribucion_binomial_negativa(x, r, p):
+    return combinacion(x - 1, r - 1) * (1 - p)**(x - r) * p**r
+
+# Función que construye la lista que conforma la fmp de acuerdo a la distribucion binomial negativa
+def calculo_fmp(x, r, p):
+    resultado = [0]*(x - r + 1)
+    for i, num_ensayos in enumerate(range(r, x+1)):
+        resultado[i] = distribucion_binomial_negativa(num_ensayos, r, p)
+        
+    return resultado
+
 # Calcula la función masa de probabilidad y la grafica para los dados ideales
 funcion_masa_probabilidad1 = suma_dados(dado_ideal1, dado_ideal2)
 #print(funcion_masa_probabilidad1)
-plot_funcion_masa_probabilidad(funcion_masa_probabilidad1)
+plot_funcion_masa_probabilidad(funcion_masa_probabilidad1, 2)
 
 # Calcula la función masa de probabilidad y la grafica para los dados trucados
 funcion_masa_probabilidad2 = suma_dados(dado_truco1, dado_truco2)
 #print(funcion_masa_probabilidad2)
-plot_funcion_masa_probabilidad(funcion_masa_probabilidad2)
+plot_funcion_masa_probabilidad(funcion_masa_probabilidad2, 2)
+
+# Calcula la fmp según la distribución binomial negativa y la grafica para los dados ideales
+fmp1 = calculo_fmp(10, 3, funcion_masa_probabilidad1[5])
+#print(fmp1)
+plot_funcion_masa_probabilidad(fmp1, 3)
+
+# Calcula la fmp según la distribución binomial negativa y la grafica para los dados trucados
+fmp2 = calculo_fmp(10, 3, funcion_masa_probabilidad2[5])
+#print(fmp2)
+plot_funcion_masa_probabilidad(fmp2, 3)
